@@ -94,3 +94,29 @@ const config = loadConfig();
 const env = resolveEnvironment(config, 'production');
 await fetchSecrets({ projectId: config.projectId, path: config.path, env: env.slug, file: env.file });
 ```
+
+## Development
+
+```sh
+npm ci
+npm test                         # builds, then runs the node:test suite
+node scripts/check-package.mjs   # after a build: the npm package holds dist, schema, README, LICENSE only
+```
+
+### Releasing
+
+```sh
+npm version patch        # or minor / major: bumps package.json, commits, tags vX.Y.Z
+git push --follow-tags
+```
+
+The tag runs the full CI (`.github/workflows/ci.yml`: build and tests on Node 20, 22 and 24, plus the package contents check). Then `release.yml` stages the version on npm and creates the GitHub release.
+
+A staged version goes live only once a maintainer approves it with 2FA:
+
+```sh
+npm stage list @aurostack/secrets
+npm stage approve <stage-id>     # or npmjs.com → the package → Staged Packages
+```
+
+CI authenticates as an npm **trusted publisher**, so there is no token. The publisher is configured as repository `aurostack-org/secrets`, workflow `release.yml`, environment `npm`, and is allowed to stage only. The `npm` GitHub environment is restricted to `v*` tags.

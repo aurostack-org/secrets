@@ -17,7 +17,8 @@
   },
   "files": [
     "dist",
-    "schema.json"
+    "schema.json",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -31,8 +32,14 @@
     "dotenv",
     "cli"
   ],
-  "author": "Aurostack",
+  "author": "Aurostack (https://github.com/aurostack-org)",
   "license": "MIT",
+  "homepage": "https://github.com/aurostack-org/secrets#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aurostack-org/secrets.git"
+  },
+  "bugs": "https://github.com/aurostack-org/secrets/issues",
   "engines": {
     "node": ">=20"
   },

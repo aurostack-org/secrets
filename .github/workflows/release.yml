@@ -1,0 +1,62 @@
+name: Release
+
+# Cut a release with `npm version <patch|minor|major> && git push --follow-tags`:
+# npm bumps package.json and tags vX.Y.Z; this workflow runs the full CI on that
+# tag, stages the version on npm and creates the GitHub release. The version
+# goes live once a maintainer approves it with 2FA (`npm stage approve <id>`,
+# or npmjs.com → Staged Packages).
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    name: Stage on npm, release on GitHub
+    needs: ci
+    runs-on: ubuntu-latest
+    # npm's trusted publisher only accepts this environment, which GitHub
+    # restricts to v* tags.
+    environment: npm
+    permissions:
+      contents: write # the GitHub release
+      id-token: write # npm trusted publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Tag matches package.json
+        run: |
+          version="v$(node -p 'require("./package.json").version')"
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match package.json ($version)"
+            exit 1
+          fi
+
+      # dist/ is not committed, so build here; the check runs on the exact
+      # files that get staged.
+      - run: npm ci
+      - run: npm run build
+      - name: npm package holds every build output and nothing private
+        run: node scripts/check-package.mjs
+
+      # Staged publishing needs npm 11.15.0+. Authentication is the trusted
+      # publisher on npmjs.com (OIDC) — there is no token.
+      - run: npm install -g npm@latest
+      - name: Stage on npm (awaits maintainer approval)
+        run: npm stage publish
+
+      - name: GitHub release
+        run: gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag
+        env:
+          GH_TOKEN: ${{ github.token }}
