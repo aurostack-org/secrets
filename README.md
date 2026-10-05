@@ -79,7 +79,7 @@ secrets init                    # create infisical.jsonc
 secrets                         # defaultEnv
 secrets -e test                 # slug or alias
 secrets -e prod -p /worker      # override the folder path
-secrets -c ./other.config.json  # explicit config file
+secrets -c ./config/infisical.jsonc  # explicit config file
 secrets -e dev -- --domain=https://infisical.example.com   # extra args for `infisical export`
 ```
 

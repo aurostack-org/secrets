@@ -1,7 +1,7 @@
 {
   "name": "@aurostack/secrets",
   "version": "0.1.0",
-  "description": "Fetch secrets from Infisical into env files, driven by a per-project secrets.config.json",
+  "description": "Fetch secrets from Infisical into env files, driven by a per-project infisical.jsonc",
   "type": "module",
   "bin": {
     "secrets": "./dist/cli.js"
