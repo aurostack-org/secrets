@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "@aurostack/secrets config",
+  "type": "object",
+  "required": ["projectId"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "projectId": { "type": "string", "description": "Infisical project id" },
+    "path": { "type": "string", "description": "Infisical folder path, e.g. /backend. Omit for the project root." },
+    "defaultEnv": { "type": "string", "description": "Environment slug or alias used when --env is not given. Defaults to dev, or the first environment if there is no dev." },
+    "environments": {
+      "type": "object",
+      "minProperties": 1,
+      "description": "Keyed by Infisical environment slug. When set, only these environments exist. Built-in slugs (dev, test, staging, prod) fill in missing aliases/file. Defaults to all four built-ins.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "aliases": { "type": "array", "items": { "type": "string" }, "description": "Other names accepted for --env" },
+          "file": { "type": "string", "description": "Env file to write, relative to this config file" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "name": "@aurostack/secrets",
+  "version": "0.1.0",
+  "description": "Fetch secrets from Infisical into env files, driven by a per-project secrets.config.json",
+  "type": "module",
+  "bin": {
+    "secrets": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schema.json": "./schema.json"
+  },
+  "files": [
+    "dist",
+    "schema.json"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.js",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": [
+    "infisical",
+    "secrets",
+    "env",
+    "dotenv",
+    "cli"
+  ],
+  "author": "Aurostack",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^7.0.2"
+  }
+}
