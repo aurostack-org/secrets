@@ -13,6 +13,12 @@ on:
 permissions:
   contents: read
 
+# GitHub occasionally delivers one tag push twice. Queue the duplicate behind
+# the first run; it then finds the version staged and the release created.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
@@ -54,9 +60,22 @@ jobs:
       # publisher on npmjs.com (OIDC) — there is no token.
       - run: npm install -g npm@latest
       - name: Stage on npm (awaits maintainer approval)
-        run: npm stage publish
+        run: |
+          set +e
+          npm stage publish 2>&1 | tee stage.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ] && grep -q 'E409' stage.log; then
+            echo "::notice::$GITHUB_REF_NAME is already staged or published on npm; nothing to stage"
+            exit 0
+          fi
+          exit "$status"
 
       - name: GitHub release
-        run: gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "::notice::GitHub release $GITHUB_REF_NAME already exists"
+          else
+            gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag
+          fi
         env:
           GH_TOKEN: ${{ github.token }}

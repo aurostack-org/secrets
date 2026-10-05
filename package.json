@@ -4,7 +4,7 @@
   "description": "Fetch secrets from Infisical into env files, driven by a per-project infisical.jsonc",
   "type": "module",
   "bin": {
-    "secrets": "./dist/cli.js"
+    "secrets": "dist/cli.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
